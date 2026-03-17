@@ -50,6 +50,20 @@ class FakeMixedGenerator:
         return {"status": "manual_review", "candidate_text": None, "generation_error": "ambiguous", "model": model}
 
 
+class FakeLongGenerator:
+    def generate(self, *, entry, model, target_locale):
+        if entry["key"] == "Popup_Title_Common_Tips":
+            return {
+                "status": "ok",
+                "candidate_text": "This is an excessively long English UI label that should be reviewed manually",
+                "generation_error": None,
+                "model": model,
+            }
+        if entry["key"] == "mail_timeout":
+            return {"status": "ok", "candidate_text": "Expires in {day}d {hour}h {min}m", "generation_error": None, "model": model}
+        return {"status": "ok", "candidate_text": "Reset all talent nodes?<br>Refund all upgrade costs", "generation_error": None, "model": model}
+
+
 class ToolkitTests(unittest.TestCase):
     def setUp(self):
         self.temp_dir = tempfile.TemporaryDirectory()
@@ -114,6 +128,24 @@ class ToolkitTests(unittest.TestCase):
         glossary = build_glossary(report)
         self.assertEqual(len(tm["rows"]), 1)
         self.assertGreaterEqual(len(glossary["rows"]), 1)
+
+    def test_file_writeback_mirrors_to_english(self):
+        cfg = load_project_config(project_root=str(self.root), target_lang="en", writeback=True)
+        report = run_file_translation(cfg, str(self.root / "schinese" / "hud" / "ui.vdf"), generator_override=FakeGenerator())
+        target = self.root / "english" / "hud" / "ui.vdf"
+        self.assertTrue(target.exists())
+        self.assertEqual(len(report["writeback"]["written_files"]), 1)
+        target_text = target.read_text(encoding="utf-8")
+        self.assertIn('"Language"\t\t"English"', target_text)
+        self.assertIn('"Popup_Title_Common_Tips"\t\t"Tips"', target_text)
+
+    def test_length_review_blocks_writeback(self):
+        cfg = load_project_config(project_root=str(self.root), target_lang="en", writeback=True)
+        report = run_file_translation(cfg, str(self.root / "schinese" / "hud" / "ui.vdf"), generator_override=FakeLongGenerator())
+        self.assertEqual(len(report["manual_review_needed_rows"]), 1)
+        self.assertEqual(report["manual_review_needed_rows"][0]["error_codes"], ["LENGTH_REVIEW_REQUIRED"])
+        self.assertFalse((self.root / "english" / "hud" / "ui.vdf").exists())
+        self.assertEqual(len(report["writeback"]["written_files"]), 0)
 
 
 if __name__ == "__main__":

@@ -16,9 +16,13 @@ if errorlevel 1 (
 set /p PROJECT_ROOT=Localization root path:
 set /p TARGET_LANG=Target language (zh/en/ru):
 set /p MODE=Mode (full/incremental/file):
+set /p WRITEBACK=Write translated VDF files? (y/n):
+set /p REPORT_DIR=Report output directory (optional):
 set /p GENERATE_TM=Generate TM? (y/n):
 set /p GENERATE_GLOSSARY=Generate glossary? (y/n):
 set REPORT_ARGS=
+if /I "%WRITEBACK%"=="y" set REPORT_ARGS=%REPORT_ARGS% --writeback
+if not "%REPORT_DIR%"=="" set REPORT_ARGS=%REPORT_ARGS% --report-dir "%REPORT_DIR%"
 if /I "%GENERATE_TM%"=="y" set REPORT_ARGS=%REPORT_ARGS% --generate-tm
 if /I "%GENERATE_GLOSSARY%"=="y" set REPORT_ARGS=%REPORT_ARGS% --generate-glossary
 

@@ -35,6 +35,7 @@ def _common_translate_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--report-dir")
     parser.add_argument("--generate-tm", action="store_true")
     parser.add_argument("--generate-glossary", action="store_true")
+    parser.add_argument("--writeback", action="store_true")
     parser.add_argument("--model", default="gpt-5.4")
     parser.add_argument("--approval-policy", default="report-only")
 
@@ -86,6 +87,7 @@ def main() -> None:
             target_locale=args.target_locale,
             model=args.model,
             approval_policy=args.approval_policy,
+            writeback=args.writeback,
             report_dir=args.report_dir,
             generate_tm=args.generate_tm,
             generate_glossary=args.generate_glossary,

@@ -40,6 +40,7 @@ class ProjectConfig:
     target_locale: str = "english"
     model: str = "gpt-5.4"
     approval_policy: str = "report-only"
+    writeback_enabled: bool = False
     file_allowlist: List[str] = field(
         default_factory=lambda: ["**/hud/*.vdf", "**/service/*.vdf", "**/error.vdf"]
     )
