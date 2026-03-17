@@ -94,12 +94,29 @@ class ToolkitTests(unittest.TestCase):
         self.assertEqual(cfg.project_root, self.root)
         self.assertEqual(cfg.source_locale, "schinese")
 
+    def test_config_loader_accepts_locale_subdirectory_as_root(self):
+        abilities_dir = self.root / "schinese" / "abilities"
+        abilities_dir.mkdir(parents=True)
+        (abilities_dir / "skills.vdf").write_text(UI_VDF, encoding="utf-8")
+        cfg = load_project_config(project_root=str(abilities_dir), target_lang="en")
+        self.assertEqual(cfg.project_root, self.root)
+        self.assertEqual(cfg.source_locale, "schinese")
+        self.assertEqual(cfg.source_subpath, "abilities")
+
     def test_full_runner(self):
         cfg = load_project_config(project_root=str(self.root), target_lang="en")
         report = run_full_translation(cfg, generator_override=FakeGenerator())
         self.assertEqual(report["summary"]["accepted_count"], 3)
         self.assertEqual(report["summary"]["rejected_count"], 0)
         self.assertEqual(report["summary"]["manual_review_needed_count"], 0)
+
+    def test_full_runner_explicit_subdirectory_overrides_blocklist(self):
+        abilities_dir = self.root / "schinese" / "abilities"
+        abilities_dir.mkdir(parents=True)
+        (abilities_dir / "skills.vdf").write_text(UI_VDF, encoding="utf-8")
+        cfg = load_project_config(project_root=str(abilities_dir), target_lang="en")
+        report = run_full_translation(cfg, generator_override=FakeGenerator())
+        self.assertEqual(report["summary"]["accepted_count"], 3)
 
     def test_file_runner(self):
         cfg = load_project_config(project_root=str(self.root), target_lang="en")

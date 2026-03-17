@@ -17,7 +17,12 @@ set /p PROJECT_ROOT=Localization root path:
 set /p TARGET_LANG=Target language (zh/en/ru):
 set /p MODE=Mode (full/incremental/file):
 set /p WRITEBACK=Write translated VDF files? (y/n):
-set /p REPORT_DIR=Report output directory (optional):
+set REPORT_DIR=
+set /p SAVE_REPORTS=Save report files? (y/n):
+if /I "%SAVE_REPORTS%"=="y" (
+    set /p REPORT_DIR=Report output directory (blank=reports):
+    if "%REPORT_DIR%"=="" set REPORT_DIR=reports
+)
 set /p GENERATE_TM=Generate TM? (y/n):
 set /p GENERATE_GLOSSARY=Generate glossary? (y/n):
 set REPORT_ARGS=

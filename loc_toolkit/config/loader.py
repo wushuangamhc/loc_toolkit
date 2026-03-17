@@ -37,11 +37,17 @@ def _normalize_root_and_source_locale(
     root: Path,
     requested_source_locale: Optional[str],
     mapping: LanguageMapping,
-) -> tuple[Path, str]:
+) -> tuple[Path, str, Optional[str]]:
     known_locales = set(mapping.aliases.values())
-    if root.name in known_locales:
-        return root.parent, requested_source_locale or root.name
-    return root, requested_source_locale or "schinese"
+    current = root
+    while True:
+        if current.name in known_locales:
+            subpath = None if current == root else str(root.relative_to(current).as_posix())
+            return current.parent, requested_source_locale or current.name, subpath
+        if current.parent == current:
+            break
+        current = current.parent
+    return root, requested_source_locale or "schinese", None
 
 
 def load_project_config(
@@ -65,7 +71,7 @@ def load_project_config(
         raw = json.loads(cfg_path.read_text(encoding="utf-8"))
 
     mapping = LanguageMapping(aliases=dict(raw.get("language_mapping", LanguageMapping().aliases)))
-    normalized_root, normalized_source_locale = _normalize_root_and_source_locale(
+    normalized_root, normalized_source_locale, source_subpath = _normalize_root_and_source_locale(
         root,
         source_locale or raw.get("source_locale"),
         mapping,
@@ -86,6 +92,7 @@ def load_project_config(
     return ProjectConfig(
         project_root=root,
         source_locale=resolved_source_locale,
+        source_subpath=source_subpath or raw.get("source_subpath"),
         target_locale=resolved_target_locale,
         model=model or raw.get("model", "gpt-5.4"),
         approval_policy=approval_policy or raw.get("approval_policy", "report-only"),
@@ -101,4 +108,5 @@ def load_project_config(
         low_risk_only=bool(raw.get("low_risk_only", True)),
         max_rows=raw.get("max_rows"),
         max_rows_per_file=raw.get("max_rows_per_file"),
+        continuation_marker=raw.get("continuation_marker", " [LOC_CONTINUE]"),
     )

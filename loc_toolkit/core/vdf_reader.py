@@ -45,6 +45,13 @@ def collect_source_files(config: ProjectConfig) -> List[Path]:
     source_root = config.source_root
     if not source_root.exists():
         return []
+    if config.source_subpath:
+        selected_root = (source_root / config.source_subpath).resolve()
+        if not selected_root.exists():
+            return []
+        if selected_root.is_file():
+            return [selected_root] if selected_root.suffix.lower() == ".vdf" else []
+        return sorted(selected_root.rglob("*.vdf"))
     files: List[Path] = []
     for file_path in sorted(source_root.rglob("*.vdf")):
         relative_path = file_path.relative_to(source_root).as_posix()

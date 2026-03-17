@@ -37,6 +37,7 @@ class LanguageMapping:
 class ProjectConfig:
     project_root: Path
     source_locale: str = "schinese"
+    source_subpath: Optional[str] = None
     target_locale: str = "english"
     model: str = "gpt-5.4"
     approval_policy: str = "report-only"
@@ -54,6 +55,7 @@ class ProjectConfig:
     low_risk_only: bool = True
     max_rows: Optional[int] = None
     max_rows_per_file: Optional[int] = None
+    continuation_marker: str = " [LOC_CONTINUE]"
 
     @property
     def source_root(self) -> Path:
