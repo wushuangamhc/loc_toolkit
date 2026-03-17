@@ -75,6 +75,11 @@ class ToolkitTests(unittest.TestCase):
         self.assertTrue(cfg.tm.enabled)
         self.assertIn("english", cfg.source_of_truth_excluded_locales)
 
+    def test_config_loader_accepts_locale_directory_as_root(self):
+        cfg = load_project_config(project_root=str(self.root / "schinese"), target_lang="en")
+        self.assertEqual(cfg.project_root, self.root)
+        self.assertEqual(cfg.source_locale, "schinese")
+
     def test_full_runner(self):
         cfg = load_project_config(project_root=str(self.root), target_lang="en")
         report = run_full_translation(cfg, generator_override=FakeGenerator())

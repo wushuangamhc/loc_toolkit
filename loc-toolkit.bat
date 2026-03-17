@@ -1,5 +1,6 @@
 @echo off
 setlocal
+cd /d "%~dp0"
 
 where python >nul 2>nul
 if errorlevel 1 (
@@ -23,20 +24,27 @@ if /I "%GENERATE_GLOSSARY%"=="y" set REPORT_ARGS=%REPORT_ARGS% --generate-glossa
 
 if /I "%MODE%"=="full" (
     python -m loc_toolkit.cli translate full --project-root "%PROJECT_ROOT%" --target-lang %TARGET_LANG% %REPORT_ARGS%
-    exit /b %errorlevel%
+    set EXITCODE=%errorlevel%
+    pause
+    exit /b %EXITCODE%
 )
 
 if /I "%MODE%"=="incremental" (
     set /p BASELINE=Baseline manifest path:
     python -m loc_toolkit.cli translate incremental --project-root "%PROJECT_ROOT%" --target-lang %TARGET_LANG% --baseline-manifest "%BASELINE%" %REPORT_ARGS%
-    exit /b %errorlevel%
+    set EXITCODE=%errorlevel%
+    pause
+    exit /b %EXITCODE%
 )
 
 if /I "%MODE%"=="file" (
     set /p SOURCE_FILE=Source file path:
     python -m loc_toolkit.cli translate file --project-root "%PROJECT_ROOT%" --target-lang %TARGET_LANG% --source-file "%SOURCE_FILE%" %REPORT_ARGS%
-    exit /b %errorlevel%
+    set EXITCODE=%errorlevel%
+    pause
+    exit /b %EXITCODE%
 )
 
 echo Unsupported mode: %MODE%
+pause
 exit /b 1

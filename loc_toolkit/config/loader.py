@@ -33,6 +33,17 @@ def _resolve_target_locale(target_lang: Optional[str], raw_target_locale: Option
     return "english"
 
 
+def _normalize_root_and_source_locale(
+    root: Path,
+    requested_source_locale: Optional[str],
+    mapping: LanguageMapping,
+) -> tuple[Path, str]:
+    known_locales = set(mapping.aliases.values())
+    if root.name in known_locales:
+        return root.parent, requested_source_locale or root.name
+    return root, requested_source_locale or "schinese"
+
+
 def load_project_config(
     *,
     project_root: str,
@@ -53,7 +64,13 @@ def load_project_config(
         raw = json.loads(cfg_path.read_text(encoding="utf-8"))
 
     mapping = LanguageMapping(aliases=dict(raw.get("language_mapping", LanguageMapping().aliases)))
-    resolved_source_locale = source_locale or raw.get("source_locale", "schinese")
+    normalized_root, normalized_source_locale = _normalize_root_and_source_locale(
+        root,
+        source_locale or raw.get("source_locale"),
+        mapping,
+    )
+    root = normalized_root
+    resolved_source_locale = normalized_source_locale
     resolved_target_locale = _resolve_target_locale(target_lang, target_locale or raw.get("target_locale"), mapping)
 
     tm_config = _to_artifact_config(raw.get("tm"))
