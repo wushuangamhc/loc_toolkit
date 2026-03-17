@@ -1,0 +1,24 @@
+{
+  "source_locale": "schinese",
+  "target_locale": "english",
+  "model": "gpt-5.4",
+  "approval_policy": "report-only",
+  "file_allowlist": ["**/hud/*.vdf", "**/service/*.vdf", "**/error.vdf"],
+  "file_blocklist": ["**/heroes/*.vdf", "**/items/*.vdf", "**/abilities/*.vdf"],
+  "tm": {
+    "enabled": false,
+    "formats": ["json", "csv"]
+  },
+  "glossary": {
+    "enabled": false,
+    "formats": ["json", "csv"]
+  },
+  "codex": {
+    "exec_path": "",
+    "cwd": "",
+    "extra_args": [],
+    "timeout_seconds": 120
+  },
+  "source_of_truth_excluded_locales": ["english"],
+  "low_risk_only": true
+}

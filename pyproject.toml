@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "loc-toolkit"
+version = "0.1.0"
+description = "Portable localization pretranslation toolkit with protected-token validation."
+requires-python = ">=3.9"
+
+[project.scripts]
+loc-toolkit = "loc_toolkit.cli:main"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["loc_toolkit*"]
